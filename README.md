@@ -8,3 +8,4 @@ cd foldername
 ```bash
 npx vite
 ```
+Test it

@@ -29,7 +29,7 @@ const loader = new GLTFLoader();
 // Load the cat model
 let catModel;
 // After loading the model
-loader.load('Attack helicopter.glb', (gltf) => {
+loader.load('cat.gltf', (gltf) => {
     catModel = gltf.scene;
     catModel.scale.set(0.6, 0.6, 0.6); // Adjust the scale as needed
     catModel.position.set(0, 0, 0); // Adjust the position as needed
