@@ -7,6 +7,10 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 // Initialize scene
 const scene = new THREE.Scene();
 
+// Create camera
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.9, 1000);
+
+
 new RGBELoader()
     .load("/environment1.hdr", function (texture) {
         texture.mapping = THREE.EquirectangularReflectionMapping;
@@ -14,70 +18,89 @@ new RGBELoader()
         scene.environment = texture;
     });
 
-// Create camera
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
 
-// Create WebGL renderer
+//Keep track of the mouse position, so we can make the eye move
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+
+//Keep the 3D object on a global variable so we can access it later
+let object;
+
+//OrbitControls allow the camera to move around the scene
+let controls;
+
+//Set which object to render
+let objToRender = 'cat';
+
+//Instantiate a loader for the .gltf file
+const loader = new GLTFLoader();
+
+//Load the file
+loader.load(
+  `/${objToRender}/cat.gltf`,
+  function (gltf) {
+    //If the file is loaded, add it to the scene
+    object = gltf.scene;
+    scene.add(object);
+  },
+  function (xhr) {
+    //While it is loading, log the progress
+    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+  },
+  function (error) {
+    //If there is an error, log it
+    console.error(error);
+  }
+);
+
+//Instantiate a new renderer and set its size
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.6;
-renderer.outputEncoding = THREE.LinearEncoding;
 
 document.body.appendChild(renderer.domElement);
 
-// Add resize event listener
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+//Add the renderer to the DOM
+document.getElementById("container3D").appendChild(renderer.domElement);
+
+//Set how far the camera will be from the 3D model
+camera.position.z = objToRender === "cat" ? 8 : 300;
+
+//Add lights to the scene, so we can actually see the 3D model
+const topLight = new THREE.DirectionalLight(0xffffff, 1); // (color, intensity)
+topLight.position.set(500, 500, 500) //top-left-ish
+topLight.castShadow = true;
+scene.add(topLight);
+
+const ambientLight = new THREE.AmbientLight(0x333333, objToRender === "cat" ? 5 : 1);
+scene.add(ambientLight);
+
+//This adds controls to the camera, so we can rotate / zoom it with the mouse
+if (objToRender === "cat") {
+  controls = new OrbitControls(camera, renderer.domElement);
+}
+
+//Render the scene
+function animate() {
+  requestAnimationFrame(animate);
+  //Here we could add some code to update the scene, adding some automatic movement
+  renderer.render(scene, camera);
+}
+
+//Add a listener to the window, so we can resize the window and the camera
+window.addEventListener("resize", function () {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Create GLTF loader
-const loader = new GLTFLoader();
+//add mouse position listener, so we can make the eye move
+document.onmousemove = (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+}
 
-// Load the cat model
-let catModel;
-// After loading the model
-loader.load('cat.gltf', (gltf) => {
-    catModel = gltf.scene;
-    catModel.scale.set(0.6, 0.6, 0.6); // Adjust the scale as needed
-    catModel.position.set(0, 0, 0); // Adjust the position as needed
-    // Rotate the model externally before exporting or adjust the rotation manually
-    catModel.rotation.set(0, Math.PI / 2, 0);
-    scene.add(catModel);
-});
-
-
-// Create OrbitControls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-controls.dampingFactor = 0.25;
-controls.screenSpacePanning = false;
-controls.maxPolarAngle = Math.PI / 2;
-
-// Example directional light
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(1, 1, 1).normalize();
-scene.add(light);
-
-// Animation loop
-const animate = () => {
-    requestAnimationFrame(animate);
-
-    // Rotate the cat model
-    if (catModel) {
-        catModel.rotation.x = 0;
-        catModel.rotation.y = 0;
-        catModel.rotation.z = 0;
-    }
-
-    controls.update(); // Update controls
-
-    renderer.render(scene, camera);
-};
-
-// Start animation loop
+//Start the 3D rendering
 animate();
