@@ -8,4 +8,8 @@ cd foldername
 ```bash
 npx vite
 ```
-Test it
+To host it live
+
+1. Go to library of choice
+2. Select all content inside dist folder
+3. Upload/Drag drop the Dist folder contents to public_html of you website
