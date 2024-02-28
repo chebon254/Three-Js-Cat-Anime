@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var scene = new BABYLON.Scene(engine);
 
     // Load the 3D model
-    BABYLON.SceneLoader.Append("", "cat.gltf", scene, function () {
+    BABYLON.SceneLoader.Append("", "cat2_rig02.gltf", scene, function () {
         // Model loaded callback (if needed)
         // Find the root node or container mesh of the cat model
         var catContainer = scene.meshes.find(mesh => mesh.name === "RootNode" || mesh.name === "ContainerMesh");
