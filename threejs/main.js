@@ -37,7 +37,7 @@ const loader = new GLTFLoader();
 
 //Load the file
 loader.load(
-  `/${objToRender}/cat.gltf`,
+  `/${objToRender}/cat2_rig03.gltf`,
   function (gltf) {
     //If the file is loaded, add it to the scene
     object = gltf.scene;
