@@ -11,12 +11,13 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.9, 1000);
 
 
-new RGBELoader()
-    .load("/environment1.hdr", function (texture) {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
-        scene.background = texture;
-        scene.environment = texture;
-    });
+new RGBELoader().load("/environment1.hdr", function (texture) {
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  texture.encoding = THREE.LinearEncoding; // Ensure correct texture encoding
+  scene.background = texture;
+  scene.environment = texture;
+});
+
 
 
 //Keep track of the mouse position, so we can make the eye move
